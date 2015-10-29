@@ -10,8 +10,14 @@ module Preferences
 
       @type = args.first ? args.first.to_sym : :boolean
 
+      cast_type = if @type == :any
+        nil
+      else
+        ActiveRecord::Type.const_get(@type.to_s.camelize).new
+      end
+
       # Create a column that will be responsible for typecasting
-      @column = ActiveRecord::ConnectionAdapters::Column.new(name.to_s, options[:default], @type == :any ? nil : @type.to_s)
+      @column = ActiveRecord::ConnectionAdapters::Column.new(name.to_s, options[:default], cast_type)
 
       @group_defaults = (options[:group_defaults] || {}).inject({}) do |defaults, (group, default)|
         defaults[group.is_a?(Symbol) ? group.to_s : group] = type_cast(default)
@@ -39,7 +45,7 @@ module Preferences
     # This uses ActiveRecord's typecast functionality so the same rules for
     # typecasting a model's columns apply here.
     def type_cast(value)
-      @type == :any ? value : ActiveRecord::Type.const_get(@type.to_s.camelize).new.type_cast_from_user(value)
+      @type == :any ? value : @column.type_cast_from_user(value)
     end
 
     # Typecasts the value to true/false depending on the type of preference
