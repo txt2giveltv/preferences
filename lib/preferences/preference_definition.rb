@@ -1,14 +1,3 @@
-
-module HstoreAccessor
-  module TypeHelpers
-    class << self
-      def column_type_for(attribute, data_type)
-        ActiveRecord::ConnectionAdapters::Column.new(attribute.to_s, nil, TYPES[data_type].new)
-      end
-
-    end
-  end
-end
 module Preferences
   # Represents the definition of a preference for a particular model
   class PreferenceDefinition
