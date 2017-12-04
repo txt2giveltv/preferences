@@ -1,6 +1,29 @@
+
+module HstoreAccessor
+  module TypeHelpers
+    class << self
+      def column_type_for(attribute, data_type)
+        ActiveRecord::ConnectionAdapters::Column.new(attribute.to_s, nil, TYPES[data_type].new)
+      end
+
+    end
+  end
+end
 module Preferences
   # Represents the definition of a preference for a particular model
   class PreferenceDefinition
+    TYPES = {
+      boolean: ActiveRecord::Type::Boolean,
+      date: ActiveRecord::Type::Date,
+      datetime: ActiveRecord::Type::DateTime,
+      decimal: ActiveRecord::Type::Decimal,
+      float: ActiveRecord::Type::Float,
+      integer: ActiveRecord::Type::Integer,
+      string: ActiveRecord::Type::String
+    }
+
+    TYPES.default = ActiveRecord::Type::Value
+
     # The data type for the content stored in this preference type
     attr_reader :type
 
@@ -42,10 +65,23 @@ module Preferences
     end
 
     # Typecasts the value based on the type of preference that was defined.
-    # This uses ActiveRecord's typecast functionality so the same rules for
-    # typecasting a model's columns apply here.
+    # This uses functionality added in to ActiveRecord's attributes api in Rails 5
+    # so the same rules for typecasting a model's columns apply here.
     def type_cast(value)
-      @type == :any ? value : @column.type_cast_from_user(value)
+      @type == :any ? value : cast(@column.type, value)
+    end
+
+    def cast(type, value)
+      return nil if value.nil?
+
+      case type
+      when :string, :decimal
+        value
+      when :integer, :float, :datetime, :date, :boolean
+        TYPES[type].new.cast(value)
+      else value
+        # Nothing.
+      end
     end
 
     # Typecasts the value to true/false depending on the type of preference
