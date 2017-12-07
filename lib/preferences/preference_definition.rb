@@ -50,7 +50,7 @@ module Preferences
 
     # Determines whether column backing this preference stores numberic values
     def number?
-      @column.number?
+      [:integer, :float].include?(@column.sql_type_metadata.type)
     end
 
     # Typecasts the value based on the type of preference that was defined.
