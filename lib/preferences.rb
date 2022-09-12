@@ -2,38 +2,38 @@ require 'preferences/engine'
 require 'preferences/preference_definition'
 
 # Adds support for defining preferences on ActiveRecord models.
-# 
+#
 # == Saving preferences
-# 
+#
 # Preferences are not automatically saved when they are set.  You must save
 # the record that the preferences were set on.
-# 
+#
 # For example,
-# 
+#
 #   class User < ActiveRecord::Base
 #     preference :notifications
 #   end
-#   
+#
 #   u = User.new(:login => 'admin', :prefers_notifications => false)
 #   u.save!
-#   
+#
 #   u = User.find_by_login('admin')
 #   u.attributes = {:prefers_notifications => true}
 #   u.save!
-# 
+#
 # == Validations
-# 
+#
 # Since the generated accessors for a preference allow the preference to be
 # treated just like regular ActiveRecord attributes, they can also be
 # validated against in the same way.  For example,
 # 
 #   class User < ActiveRecord::Base
 #     preference :color, :string
-#     
+#
 #     validates_presence_of :preferred_color
 #     validates_inclusion_of :preferred_color, :in => %w(red green blue)
 #   end
-#   
+#
 #   u = User.new
 #   u.valid?                        # => false
 #   u.errors.on(:preferred_color)   # => "can't be blank"
@@ -41,7 +41,7 @@ require 'preferences/preference_definition'
 #   u.preferred_color = 'white'
 #   u.valid?                        # => false
 #   u.errors.on(:preferred_color)   # => "is not included in the list"
-#   
+#
 #   u.preferred_color = 'red'
 #   u.valid?                        # => true
 module Preferences
@@ -149,30 +149,30 @@ module Preferences
     #   user.preferred_color = 'red', car   # => 'red'
     #   user.preferred_color(car)           # => 'red'
     #   user.preferred_color?(car)          # => true
-    #   
+    #
     #   user.save!  # => true
     def preference(name, *args)
       unless included_modules.include?(InstanceMethods)
-        class_inheritable_hash :preference_definitions
+        class_attribute :preference_definitions
         self.preference_definitions = {}
-        
+
         has_many :stored_preferences, :as => :owner, :class_name => 'Preference', :dependent => :destroy
-        
+
         after_save :update_preferences
-        
+
         # Named scopes
         scope :with_preferences, lambda {|preferences| build_preference_scope(preferences)}
         scope :without_preferences, lambda {|preferences| build_preference_scope(preferences, true)}
-        
+
         extend Preferences::ClassMethods
         include Preferences::InstanceMethods
       end
-      
+
       # Create the definition
       name = name.to_s
       definition = PreferenceDefinition.new(name, *args)
       self.preference_definitions[name] = definition
-      
+
       # Create short-hand accessor methods, making sure that the name
       # is method-safe in terms of what characters are allowed
       name = name.gsub(/[^A-Za-z0-9_-]/, '').underscore
