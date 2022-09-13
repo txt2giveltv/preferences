@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Preferences
   # Represents the definition of a preference for a particular model
   class PreferenceDefinition
@@ -25,7 +27,7 @@ module Preferences
       else
         ActiveRecord::Type.const_get(@type.to_s.camelize).new
       end
-      puts "### VAR YYYY cast_type  ###>>  #{cast_type.type}"
+      puts "### PREFERENCE GEM: cast_type  ###>>  #{cast_type.type}"
       sql_type_metadata = ActiveRecord::ConnectionAdapters::SqlTypeMetadata.new(
         sql_type: cast_type.type.to_s,
         type: cast_type.type,
