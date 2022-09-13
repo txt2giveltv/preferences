@@ -1,7 +1,7 @@
 # Represents a preferred value for a particular preference on a model.
-# 
+#
 # == Grouped preferences
-# 
+#
 # In addition to simple named preferences, preferences can also be grouped by
 # a particular value, be it a string or ActiveRecord object.  For example, a
 # User may have a preferred color for a particular Car.  In this case, the
@@ -31,7 +31,7 @@ class Preference < ActiveRecord::Base
       else
         group_id, group_type = nil, group.is_a?(Symbol) ? group.to_s : group
       end
-      
+
       [group_id, group_type]
     end
   end
@@ -43,7 +43,7 @@ class Preference < ActiveRecord::Base
     # stored owner type class
     owner_type && (find_definition(owner_type.constantize) || find_definition(owner.class))
   end
-  
+
   # Typecasts the value depending on the preference definition's declared type
   def value
     value = read_attribute(:value)
@@ -55,7 +55,7 @@ class Preference < ActiveRecord::Base
   def group_with_optional_lookup
     group_id ? group_without_optional_lookup : group_type
   end
-  alias_method_chain :group, :optional_lookup
+  alias_method :group, :optional_lookup
   
   private
     # Finds the definition for this preference in the given owner class.
