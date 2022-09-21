@@ -8,6 +8,8 @@
 # +owner+ is the User record, the +name+ is "color", and the +group+ is the
 # Car record.  This allows preferences to have a sort of context around them.
 class Preference < ActiveRecord::Base
+  prepend GroupWithOptionalLookup
+
   belongs_to :owner, polymorphic: true
   belongs_to :group, polymorphic: true
 
@@ -52,12 +54,15 @@ class Preference < ActiveRecord::Base
   end
 
   # Only searches for the group record if the group id is specified
-  def group_with_optional_lookup
-    group_id ? group_without_optional_lookup : group_type
-  end
+  # def group_with_optional_lookup
+  #   group_id ? group_without_optional_lookup : group_type
+  # end
 
-  alias_method :group, :optional_lookup
+  # alias_method_chain :group, :optional_lookup
 
+  # alias_method :group_without_optional_lookup, :group # "dettach" group method
+  # alias_method :group, :group_with_optional_lookup    # "attach" new group method
+  # BOTH OPTIONS DEPRECATED FOR prepend
   private
 
     # Finds the definition for this preference in the given owner class.
