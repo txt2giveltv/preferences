@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Preferences
   # Represents the definition of a preference for a particular model
   class PreferenceDefinition
@@ -27,15 +25,17 @@ module Preferences
       else
         ActiveRecord::Type.const_get(@type.to_s.camelize).new
       end
-      puts "### PREFERENCE GEM: cast_type  ###>>  #{cast_type.type}"
+      puts "### GEMS/lib/preferences/preference_definition.rb  cast_type  ###>>  #{cast_type.type}"
       sql_type_metadata = ActiveRecord::ConnectionAdapters::SqlTypeMetadata.new(
         sql_type: cast_type.type.to_s,
         type: cast_type.type,
         limit: cast_type.limit,
         precision: cast_type.precision,
         scale: cast_type.scale)
-      # Create a column that will be responsible for typecasting
+        # Create a column that will be responsible for typecasting
       @column = ActiveRecord::ConnectionAdapters::Column.new(name.to_s, sql_type_metadata)
+      puts "### 37 preference_definition.rb  COLUMN  ###>>  #{@column.inspect}"
+
       @group_defaults = (options[:group_defaults] || {}).inject({}) do |defaults, (group, default)|
         defaults[group.is_a?(Symbol) ? group.to_s : group] = type_cast(default)
         defaults
@@ -62,19 +62,23 @@ module Preferences
     # This uses functionality added in to ActiveRecord's attributes api in Rails 5
     # so the same rules for typecasting a model's columns apply here.
     def type_cast(value)
+      puts "### 63   TYPE_cast  ###>>  #{value.inspect}"
       @type == :any ? value : cast(@column.type, value)
     end
 
     def cast(type, value)
+      puts "### 68 preference_definition.rb  CASTING type  ###>>  #{type.inspect} VALUE: >>  #{value.inspect}"
+
       return nil if value.nil?
 
       case type
       when :string, :decimal
         value
       when :integer, :float, :datetime, :date, :boolean
+        puts "### 76 preference_definition.rb  ###>>  #{value.inspect}"
         TYPES[type].new.cast(value)
-      else value
-        # Nothing.
+      else
+        value
       end
     end
 

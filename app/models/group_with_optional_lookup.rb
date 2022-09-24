@@ -2,6 +2,6 @@
 
 module GroupWithOptionalLookup
   def group
-    group_id ? group_without_optional_lookup : group_type
+    group_id ? group_id : group_type
   end
 end
