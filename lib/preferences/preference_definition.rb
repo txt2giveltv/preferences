@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Preferences
   # Represents the definition of a preference for a particular model
   class PreferenceDefinition
@@ -18,14 +20,14 @@ module Preferences
 
     def initialize(name, *args) #:nodoc:
       options = args.extract_options!
-      options.assert_valid_keys(:default, :group_defaults)
+      options.assert_valid_keys(:default, :group_defaults) # validates all keys in a hash match
       @type = args.first ? args.first.to_sym : :boolean
       cast_type = if @type == :any
-        nil
-      else
-        ActiveRecord::Type.const_get(@type.to_s.camelize).new
-      end
-      puts "### GEMS/lib/preferences/preference_definition.rb  cast_type  ###>>  #{cast_type.type}"
+                    nil
+                  else
+                    ActiveRecord::Type.const_get(@type.to_s.camelize).new
+                  end
+      puts "### 28 PFDEF  @type#> #{@type}, name #> #{name}, cast_type  #>  #{cast_type.type}"
       sql_type_metadata = ActiveRecord::ConnectionAdapters::SqlTypeMetadata.new(
         sql_type: cast_type.type.to_s,
         type: cast_type.type,
@@ -34,9 +36,9 @@ module Preferences
         scale: cast_type.scale)
         # Create a column that will be responsible for typecasting
       @column = ActiveRecord::ConnectionAdapters::Column.new(name.to_s, sql_type_metadata)
-      puts "### 37 preference_definition.rb  COLUMN  ###>>  #{@column.inspect}"
+      puts "### 37 PFDEF COLUMN  ###>>  #{@column.inspect}"
 
-      @group_defaults = (options[:group_defaults] || {}).inject({}) do |defaults, (group, default)|
+      @group_defaults = options[:group_defaults]&.inject({}) do |defaults, (group, default)|
         defaults[group.is_a?(Symbol) ? group.to_s : group] = type_cast(default)
         defaults
       end
@@ -50,6 +52,7 @@ module Preferences
     # The default value to use for the preference in case none have been
     # previously defined
     def default_value(group = nil)
+      puts "### 55 PREFDEF  ###>>  #{group.inspect}"
       @group_defaults.include?(group) ? @group_defaults[group] : @column.default
     end
 
@@ -62,12 +65,12 @@ module Preferences
     # This uses functionality added in to ActiveRecord's attributes api in Rails 5
     # so the same rules for typecasting a model's columns apply here.
     def type_cast(value)
-      puts "### 63   TYPE_cast  ###>>  #{value.inspect}"
+      puts "### 63 PFDEF  TYPE_cast  ###>>  #{value.inspect}"
       @type == :any ? value : cast(@column.type, value)
     end
 
     def cast(type, value)
-      puts "### 68 preference_definition.rb  CASTING type  ###>>  #{type.inspect} VALUE: >>  #{value.inspect}"
+      puts "### 68 PFDEF  CASTING type  ###>>  #{type.inspect} VALUE: >>  #{value.inspect}"
 
       return nil if value.nil?
 

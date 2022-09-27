@@ -16,11 +16,11 @@ require 'preferences/preference_definition'
 #     preference :notifications
 #   end
 #
-#   u = User.new(:login => 'admin', :prefers_notifications => false)
+#   u = User.new(login: 'admin', prefers_notifications: false)
 #   u.save!
 #
-#   u = User.find_by_login('admin')
-#   u.attributes = {:prefers_notifications => true}
+#   u = User.find_by(login: 'admin')
+#   u.attributes = { prefers_notifications: true }
 #   u.save!
 #
 # == Validations
@@ -64,8 +64,8 @@ module Preferences
     # particular model.
     #
     #   class User < ActiveRecord::Base
-    #     preference :notifications, :default => false
-    #     preference :color, :string, :default => 'red', :group_defaults => {:car => 'black'}
+    #     preference :notifications, default: false
+    #     preference :color, :string, default: 'red', group_defaults: {car: 'black'}
     #     preference :favorite_number, :integer
     #     preference :data, :any # Allows any data type to be stored
     #   end
@@ -93,13 +93,13 @@ module Preferences
     #
     # Example:
     #
-    #   User.with_preferences(:notifications => true)
-    #   User.with_preferences(:notifications => true, :color => 'blue')
+    #   User.with_preferences(notifications: true)
+    #   User.with_preferences(notifications: true, color: 'blue')
     #
     #   # Searching with group preferences
     #   car = Car.find(:first)
-    #   User.with_preferences(car => {:color => 'blue'})
-    #   User.with_preferences(:notifications => true, car => {:color => 'blue'})
+    #   User.with_preferences(car => {color: 'blue'})
+    #   User.with_preferences(notifications: true, car => {color: 'blue'})
     #
     # == Generated accessors
     #
@@ -173,6 +173,7 @@ module Preferences
       # Create the definition
       name = name.to_s
       definition = PreferenceDefinition.new(name, *args)
+      puts "### 176 preferences.rb definition ###>>  #{definition.inspect}"
       self.preference_definitions[name] = definition
 
       # Create short-hand accessor methods, making sure that the name
@@ -277,7 +278,7 @@ module Preferences
       end
 
       sql = statements.map! {|statement| "(#{statement})"} * ' AND '
-      {joins: joins, conditions: values.unshift(sql)}
+      { joins: joins, conditions: values.unshift(sql) }
     end
   end
 
@@ -307,10 +308,10 @@ module Preferences
     #   => {"language=>"English", "color"=>"red"}
     def preferences(group = nil)
       preferences = preferences_group(group)
-
+      puts "### 310 PFS  GROUP ###>>  #{group.inspect} -- preferences > #{preferences.inspect}"
       unless preferences_group_loaded?(group)
         group_id, group_type = Preference.split_group(group)
-        find_preferences(:group_id => group_id, :group_type => group_type).each do |preference|
+        find_preferences(group_id: group_id, group_type: group_type).each do |preference|
           preferences[preference.name] = preference.value unless preferences.include?(preference.name)
         end
 
@@ -320,7 +321,7 @@ module Preferences
         end
       end
 
-      preferences.inject({}) do |typed_preferences, (name, value)|
+      preferences.reduce({}) do |typed_preferences, (name, value)|
         typed_preferences[name] = value.nil? ? value : preference_definitions[name].type_cast(value)
         typed_preferences
       end
@@ -359,7 +360,7 @@ module Preferences
     # == Examples
     #
     #   class User < ActiveRecord::Base
-    #     preference :color, :string, :default => 'red'
+    #     preference :color, :string, default: 'red'
     #   end
     #
     #   user = User.create
@@ -372,21 +373,25 @@ module Preferences
     def preferred(name, group = nil)
       name = name.to_s
       assert_valid_preference(name)
-
-      if preferences_group(group).include?(name)
+      puts "### 376 PFS  G: #{group} preferences_group(group) ###>>  #{preferences_group(group)}"
+      if preferences_group(group)&.include?(name)
+        puts "### 378 PFS name >> #{name}"
         # Value for this group/name has been written, but not saved yet:
         # grab from the pending values
         value = preferences_group(group)[name]
       else
+        puts "### 383 PFS name >> #{name}"
         # Grab the first preference; if it doesn't exist, use the default value
         group_id, group_type = Preference.split_group(group)
+        puts "### 386 PFS name >> #{name} group_id #{group_id}"
         preference = find_preferences(name: name, group_id: group_id, group_type: group_type).first unless preferences_group_loaded?(group)
-
+        puts "### 388 PFS preferenceDNKKKK >> #{preference_definitions.inspect[name]}"
         value = preference ? preference.value : preference_definitions[name].default_value(group_type)
+        puts "### 390 PFS VALUE >> #{value}"
         preferences_group(group)[name] = value
       end
-
       definition = preference_definitions[name]
+      puts "### 394 PFS definition >> #{definition}"
       value = definition.type_cast(value) unless value.nil?
       value
     end
@@ -535,7 +540,7 @@ module Preferences
 
       # Determines whether a preference changed in the given group
       def preference_changed?(name, group)
-        preferences_changed_group(group).include?(name)
+        preferences_changed_group(group)&.include?(name)
       end
 
       # Builds an array of [original_value, new_value] for the given preference.
@@ -607,7 +612,7 @@ module Preferences
             attributes.all? {|attribute, value| preference[attribute] == value}
           end
         else
-          puts "### /home/preferences-9178db11ecfe/lib/preferences.rb attributes  ###>>  #{attributes.inspect}"
+          puts "### 611 PFS attributes  ###>>  #{attributes.inspect}"
           stored_preferences.where(attributes)
         end
       end

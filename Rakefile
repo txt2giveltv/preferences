@@ -1,12 +1,12 @@
-require 'rubygems'
 require 'rake'
 require 'rake/testtask'
-require 'rake/rdoctask'
+require 'rdoc/task'
+# require 'tasks/rails'
 
 desc 'Default: run all tests.'
-task :default => :test
+task default: :test
 
-desc "Test preferences."
+desc 'Test preferences.'
 Rake::TestTask.new(:test) do |t|
   t.libs << 'lib'
   t.test_files = Dir['test/**/*_test.rb']
@@ -16,7 +16,7 @@ end
 begin
   require 'rcov/rcovtask'
   namespace :test do
-    desc "Test preferences with Rcov."
+    desc 'Test preferences with Rcov.'
     Rcov::RcovTask.new(:rcov) do |t|
       t.libs << 'lib'
       t.test_files = Dir['test/**/*_test.rb']
@@ -27,7 +27,7 @@ begin
 rescue LoadError
 end
 
-desc "Generate documentation for preferences."
+desc 'Generate documentation for preferences.'
 Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title    = 'preferences'

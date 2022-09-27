@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require File.expand_path(File.dirname(__FILE__) + '/../test_helper')
 
 class ModelPreferenceTest < ActiveRecord::TestCase
   def default_test
   end
-  
+
   def teardown
     User.preference_definitions.clear
   end
@@ -13,11 +15,11 @@ class ModelWithoutPreferencesTest < ActiveRecord::TestCase
   def test_should_not_create_preference_definitions
     assert !Car.respond_to?(:preference_definitions)
   end
-  
+
   def test_should_not_create_stored_preferences_association
     assert !Car.new.respond_to?(:stored_preferences)
   end
-  
+
   def test_should_not_create_preference_scopes
     assert !Car.respond_to?(:with_preferences)
     assert !Car.respond_to?(:without_preferences)
@@ -29,16 +31,16 @@ class PreferencesAfterFirstBeingDefinedTest < ModelPreferenceTest
     User.preference :notifications
     @user = new_user
   end
-  
+
   def test_should_create_preference_definitions
     assert User.respond_to?(:preference_definitions)
   end
-  
+
   def test_should_create_preference_scopes
     assert User.respond_to?(:with_preferences)
     assert User.respond_to?(:without_preferences)
   end
-  
+
   def test_should_create_stored_preferences_associations
     assert @user.respond_to?(:stored_preferences)
   end
@@ -49,45 +51,45 @@ class PreferencesAfterBeingDefinedTest < ModelPreferenceTest
     @definition = User.preference :notifications
     @user = new_user
   end
-  
+
   def test_should_raise_exception_if_invalid_options_specified
-    assert_raise(ArgumentError) {User.preference :notifications, :invalid => true}
-    assert_raise(ArgumentError) {User.preference :notifications, :boolean, :invalid => true}
+    assert_raise(ArgumentError) {User.preference :notifications, invalid: true}
+    assert_raise(ArgumentError) {User.preference :notifications, :boolean, invalid: true}
   end
-  
+
   def test_should_create_definition
     assert_not_nil @definition
     assert_equal 'notifications', @definition.name
   end
-  
+
   def test_should_create_preferred_query_method
     assert @user.respond_to?(:preferred_notifications?)
   end
-  
+
   def test_should_create_prefers_query_method
     assert @user.respond_to?(:prefers_notifications?)
   end
-  
+
   def test_should_create_preferred_reader
     assert @user.respond_to?(:preferred_notifications)
   end
-  
+
   def test_should_create_prefers_reader
     assert @user.respond_to?(:prefers_notifications)
   end
-  
+
   def test_should_create_preferred_writer
     assert @user.respond_to?(:preferred_notifications=)
   end
-  
+
   def test_should_create_prefers_writer
     assert @user.respond_to?(:prefers_notifications=)
   end
-  
+
   def test_should_create_preferred_changed_query
     assert @user.respond_to?(:preferred_notifications_changed?)
   end
-  
+
   def test_should_create_prefers_changed_query
     assert @user.respond_to?(:prefers_notifications_changed?)
   end
