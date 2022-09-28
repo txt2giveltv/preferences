@@ -242,7 +242,7 @@ module Preferences
       values = []
 
       # Flatten the preferences for easier processing
-      preferences = preferences.inject({}) do |result, (group, value)|
+      preferences = preferences.reduce({}) do |result, (group, value)|
         if value.is_a?(Hash)
           value.each {|preference, value| result[[group, preference]] = value}
         else

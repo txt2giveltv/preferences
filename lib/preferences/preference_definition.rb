@@ -19,15 +19,15 @@ module Preferences
     attr_reader :type
 
     def initialize(name, *args) #:nodoc:
-      options = args.extract_options!
+      options = args.extract_options! # {} default
       options.assert_valid_keys(:default, :group_defaults) # validates all keys in a hash match
-      @type = args.first ? args.first.to_sym : :boolean
-      cast_type = if @type == :any
+      @type = args.first ? args.first.to_sym : :boolean  # boolean by default
+      cast_type = if @type == :any  # ????
                     nil
                   else
                     ActiveRecord::Type.const_get(@type.to_s.camelize).new
                   end
-      puts "### 28 PFDEF  @type#> #{@type}, name #> #{name}, cast_type  #>  #{cast_type.type}"
+      puts "### 30 PFDEF name  #> #{name}, @type#> #{@type}, cast_type  #>  #{cast_type.type}, options  #>  #{options} "
       sql_type_metadata = ActiveRecord::ConnectionAdapters::SqlTypeMetadata.new(
         sql_type: cast_type.type.to_s,
         type: cast_type.type,
@@ -38,10 +38,7 @@ module Preferences
       @column = ActiveRecord::ConnectionAdapters::Column.new(name.to_s, sql_type_metadata)
       puts "### 37 PFDEF COLUMN  ###>>  #{@column.inspect}"
 
-      @group_defaults = options[:group_defaults]&.inject({}) do |defaults, (group, default)|
-        defaults[group.is_a?(Symbol) ? group.to_s : group] = type_cast(default)
-        defaults
-      end
+      @group_defaults = build_group_defaults(options[:group_defaults])
     end
 
     # The name of the preference
@@ -95,5 +92,16 @@ module Preferences
         !value.blank?
       end
     end
+
+    private
+
+      def build_group_defaults(group_defaults)
+        return {} unless group_defaults.is_a?(Hash)
+
+        group_defaults.reduce({}) do |defaults, (group, default)|
+          defaults[group.is_a?(Symbol) ? group.to_s : group] = type_cast(default)
+          defaults
+        end
+      end
   end
 end
