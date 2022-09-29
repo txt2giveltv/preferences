@@ -49,25 +49,25 @@ module Preferences
     # The default value to use for the preference in case none have been
     # previously defined
     def default_value(group = nil)
-      puts "### 55 PREFDEF  ###>>  #{group.inspect}"
+      puts "### 55 PREFDEF  group ###>>  #{group}"
       @group_defaults.include?(group) ? @group_defaults[group] : @column.default
     end
 
     # Determines whether column backing this preference stores numberic values
     def number?
-      [:integer, :float].include?(@column.sql_type_metadata.type)
+      [:integer, :float].include?(@column.default.type)
     end
 
     # Typecasts the value based on the type of preference that was defined.
     # This uses functionality added in to ActiveRecord's attributes api in Rails 5
     # so the same rules for typecasting a model's columns apply here.
     def type_cast(value)
-      puts "### 63 PFDEF  TYPE_cast  ###>>  #{value.inspect}"
-      @type == :any ? value : cast(@column.type, value)
+      puts "### 65 PFDEF  TYPE_cast  ###>>  #{value.inspect}"
+      @type == :any ? value : cast(@column.default.type, value)
     end
 
     def cast(type, value)
-      puts "### 68 PFDEF  CASTING type  ###>>  #{type.inspect} VALUE: >>  #{value.inspect}"
+      puts "### 70 PFDEF  CASTING type  ###>>  #{type.inspect} VALUE: >>  #{value.inspect}"
 
       return nil if value.nil?
 
@@ -75,7 +75,7 @@ module Preferences
       when :string, :decimal
         value
       when :integer, :float, :datetime, :date, :boolean
-        puts "### 76 preference_definition.rb  ###>>  #{value.inspect}"
+        puts "### 78 preference_definition.rb  ###>>  #{value.inspect}"
         TYPES[type].new.cast(value)
       else
         value

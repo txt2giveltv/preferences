@@ -379,6 +379,7 @@ module Preferences
         # Value for this group/name has been written, but not saved yet:
         # grab from the pending values
         value = preferences_group(group)[name]
+        puts "### 382 PFS  value >> #{value}"
       else
         puts "### 383 PFS name >> #{name}"
         # Grab the first preference; if it doesn't exist, use the default value
@@ -569,8 +570,9 @@ module Preferences
       # given preference.  This will use the typecasted value to determine
       # equality.
       def preference_value_changed?(name, old, value)
+        puts "### 572 PFS preference_value_changed?  ###>>  #{old}   value #{value}"
         definition = preference_definitions[name]
-        if definition.type == :integer && (old.nil? || old == 0)
+        if definition.type == :integer && (old.nil? || old.zero?)
           # For nullable numeric columns, NULL gets stored in database for blank (i.e. '') values.
           # Hence we don't record it as a change if the value changes from nil to ''.
           # If an old value of 0 is set to '' we want this to get changed to nil as otherwise it'll
