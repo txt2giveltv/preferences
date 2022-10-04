@@ -34,11 +34,13 @@ module Preferences
         limit: cast_type.limit,
         precision: cast_type.precision,
         scale: cast_type.scale)
-        # Create a column that will be responsible for typecasting
-      @column = ActiveRecord::ConnectionAdapters::Column.new(name.to_s, sql_type_metadata)
-      puts "### 37 PFDEF COLUMN  ###>>  #{@column.inspect}"
+      # Create a column that will be responsible for typecasting
+      puts "### 38 PREFDEF options[:default] ###>>  #{options[:default].inspect}"
+      @column = ActiveRecord::ConnectionAdapters::Column.new(name.to_s, options[:default].to_s, sql_type_metadata)
+      puts "### 40 PFDEF COLUMN  ###>>  #{@column.inspect}"
 
       @group_defaults = build_group_defaults(options[:group_defaults])
+      puts "### 43 PREFDEF  @group_defaults ###>>  #{@group_defaults.inspect}"
     end
 
     # The name of the preference
@@ -49,7 +51,8 @@ module Preferences
     # The default value to use for the preference in case none have been
     # previously defined
     def default_value(group = nil)
-      puts "### 55 PREFDEF  group ###>>  #{group}"
+      puts "### 52 PREFDEF  group ###>>  #{group}"
+      puts "### 53 PREFDEF COLUMN  ###>>  #{@column.inspect}"
       @group_defaults.include?(group) ? @group_defaults[group] : @column.default
     end
 
@@ -62,12 +65,12 @@ module Preferences
     # This uses functionality added in to ActiveRecord's attributes api in Rails 5
     # so the same rules for typecasting a model's columns apply here.
     def type_cast(value)
-      puts "### 65 PFDEF  TYPE_cast  ###>>  #{value.inspect}"
-      @type == :any ? value : cast(@column.default.type, value)
+      puts "### 68 PFDEF  TYPE_cast  ###>>  #{value.inspect}"
+      value ? value : cast(@column.default.type, value)
     end
 
     def cast(type, value)
-      puts "### 70 PFDEF  CASTING type  ###>>  #{type.inspect} VALUE: >>  #{value.inspect}"
+      puts "### 73 PFDEF  CASTING type  ###>>  #{type.inspect} VALUE: >>  #{value.inspect}"
 
       return nil if value.nil?
 
