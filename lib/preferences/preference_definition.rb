@@ -51,14 +51,13 @@ module Preferences
     # The default value to use for the preference in case none have been
     # previously defined
     def default_value(group = nil)
-      puts "### 52 PREFDEF  group ###>>  #{group}"
-      puts "### 53 PREFDEF COLUMN  ###>>  #{@column.inspect}"
+      #puts "### 53 PREFDEF COLUMN  ###>>  #{@column.inspect}"
       @group_defaults.include?(group) ? @group_defaults[group] : @column.default
     end
 
     # Determines whether column backing this preference stores numberic values
     def number?
-      [:integer, :float].include?(@column.default.type)
+      [:integer, :float].include?(@column.type.to_sym)
     end
 
     # Typecasts the value based on the type of preference that was defined.

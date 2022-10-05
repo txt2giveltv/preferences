@@ -374,26 +374,28 @@ module Preferences
       name = name.to_s
       assert_valid_preference(name)
       puts "### 376 PFS  G: #{group} preferences_group(group) ###>>  #{preferences_group(group)}"
-      if preferences_group(group)&.include?(name)
-        puts "### 378 PFS name >> #{name}"
+      # group_defaults: {small: '90', medium: '120', large: '190'}
+      if preferences_group(group).include?(name) # name value ∈ group_defaults
+        puts "### 379 PFS name >> #{name}"
         # Value for this group/name has been written, but not saved yet:
         # grab from the pending values
         value = preferences_group(group)[name]
-        puts "### 382 PFS  value >> #{value}"
-      else
-        puts "### 383 PFS name >> #{name}"
+        puts "### 383 PFS  value >> #{value}"
+      else  # group_defaults options doesn't exist
+        puts "### 385 PFS name >> #{name}"
         # Grab the first preference; if it doesn't exist, use the default value
         group_id, group_type = Preference.split_group(group)
-        puts "### 386 PFS name >> #{name} group_id #{group_id}"
+        puts "### 388 PFS name >> #{name} group_id >> #{group_id}"
         preference = find_preferences(name: name, group_id: group_id, group_type: group_type).first unless preferences_group_loaded?(group)
-        puts "### 388 PFS preferenceDNKKKK >> #{preference_definitions.inspect[name]}"
+        puts "### 390 PFS preference >> #{preference}"
         value = preference ? preference.value : preference_definitions[name].default_value(group_type)
-        puts "### 390 PFS VALUE >> #{value}"
+        puts "### 392 PFS VALUE >> #{value}"
         preferences_group(group)[name] = value
       end
       definition = preference_definitions[name]
-      puts "### 394 PFS definition >> #{definition}"
+      puts "### 396 PFS definition >> #{definition}"
       value = definition.type_cast(value) unless value.nil?
+      puts "### 398 PFS value >> #{value}"
       value
     end
     alias_method :prefers, :preferred
@@ -505,6 +507,7 @@ module Preferences
     end
 
     private
+
       # Asserts that the given name is a valid preference in this model.  If it
       # is not, then an ArgumentError exception is raised.
       def assert_valid_preference(name)
