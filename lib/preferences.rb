@@ -173,7 +173,7 @@ module Preferences
       # Create the definition
       name = name.to_s
       definition = PreferenceDefinition.new(name, *args)
-      puts "### 176 preferences.rb definition ###>>  #{definition.inspect}"
+      # puts "### 176 preferences.rb definition ###>>  #{definition.inspect}"
       self.preference_definitions[name] = definition
 
       # Create short-hand accessor methods, making sure that the name
@@ -308,7 +308,7 @@ module Preferences
     #   => {"language=>"English", "color"=>"red"}
     def preferences(group = nil)
       preferences = preferences_group(group)
-      puts "### 310 PFS  GROUP ###>>  #{group.inspect} -- preferences > #{preferences.inspect}"
+      # puts "### 310 PFS  GROUP ###>>  #{group.inspect} -- preferences > #{preferences.inspect}"
       unless preferences_group_loaded?(group)
         group_id, group_type = Preference.split_group(group)
         find_preferences(group_id: group_id, group_type: group_type).each do |preference|
@@ -373,29 +373,29 @@ module Preferences
     def preferred(name, group = nil)
       name = name.to_s
       assert_valid_preference(name)
-      puts "### 376 PFS  G: #{group} preferences_group(group) ###>>  #{preferences_group(group)}"
+      # puts "### 376 PFS  G: #{group} preferences_group(group) ###>>  #{preferences_group(group)}"
       # group_defaults: {small: '90', medium: '120', large: '190'}
       if preferences_group(group).include?(name) # name value ∈ group_defaults
-        puts "### 379 PFS name >> #{name}"
+        # puts "### 379 PFS name >> #{name}"
         # Value for this group/name has been written, but not saved yet:
         # grab from the pending values
         value = preferences_group(group)[name]
-        puts "### 383 PFS  value >> #{value}"
+        # puts "### 383 PFS  value >> #{value}"
       else  # group_defaults options doesn't exist
-        puts "### 385 PFS name >> #{name}"
+        # puts "### 385 PFS name >> #{name}"
         # Grab the first preference; if it doesn't exist, use the default value
         group_id, group_type = Preference.split_group(group)
-        puts "### 388 PFS name >> #{name} group_id >> #{group_id}"
+        #  puts "### 388 PFS name >> #{name} group_id >> #{group_id}"
         preference = find_preferences(name: name, group_id: group_id, group_type: group_type).first unless preferences_group_loaded?(group)
-        puts "### 390 PFS preference >> #{preference}"
+        # puts "### 390 PFS preference >> #{preference}"
         value = preference ? preference.value : preference_definitions[name].default_value(group_type)
-        puts "### 392 PFS VALUE >> #{value}"
+        # puts "### 392 PFS VALUE >> #{value}"
         preferences_group(group)[name] = value
       end
       definition = preference_definitions[name]
-      puts "### 396 PFS definition >> #{definition}"
+      # puts "### 396 PFS definition >> #{definition}"
       value = definition.type_cast(value) unless value.nil?
-      puts "### 398 PFS value >> #{value}"
+      # puts "### 398 PFS value >> #{value}"
       value
     end
     alias_method :prefers, :preferred
@@ -573,7 +573,7 @@ module Preferences
       # given preference.  This will use the typecasted value to determine
       # equality.
       def preference_value_changed?(name, old, value)
-        puts "### 572 PFS preference_value_changed?  ###>>  #{old}   value #{value}"
+        # puts "### 572 PFS preference_value_changed?  ###>>  #{old}   value #{value}"
         definition = preference_definitions[name]
         if definition.type == :integer && (old.nil? || old.zero?)
           # For nullable numeric columns, NULL gets stored in database for blank (i.e. '') values.
@@ -617,7 +617,7 @@ module Preferences
             attributes.all? {|attribute, value| preference[attribute] == value}
           end
         else
-          puts "### 611 PFS attributes  ###>>  #{attributes.inspect}"
+          # puts "### 611 PFS attributes  ###>>  #{attributes.inspect}"
           stored_preferences.where(attributes)
         end
       end

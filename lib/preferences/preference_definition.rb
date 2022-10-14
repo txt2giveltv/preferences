@@ -27,7 +27,7 @@ module Preferences
                   else
                     ActiveRecord::Type.const_get(@type.to_s.camelize).new
                   end
-      puts "### 30 PFDEF name  #> #{name}, @type#> #{@type}, cast_type  #>  #{cast_type.type}, options  #>  #{options} "
+      # puts "### 30 PFDEF name  #> #{name}, @type#> #{@type}, cast_type  #>  #{cast_type.type}, options  #>  #{options} "
       sql_type_metadata = ActiveRecord::ConnectionAdapters::SqlTypeMetadata.new(
         sql_type: cast_type.type.to_s,
         type: cast_type.type,
@@ -35,12 +35,12 @@ module Preferences
         precision: cast_type.precision,
         scale: cast_type.scale)
       # Create a column that will be responsible for typecasting
-      puts "### 38 PREFDEF options[:default] ###>>  #{options[:default].inspect}"
+      # puts "### 38 PREFDEF options[:default] ###>>  #{options[:default].inspect}"
       @column = ActiveRecord::ConnectionAdapters::Column.new(name.to_s, options[:default].to_s, sql_type_metadata)
-      puts "### 40 PFDEF COLUMN  ###>>  #{@column.inspect}"
+      # puts "### 40 PFDEF COLUMN  ###>>  #{@column.inspect}"
 
       @group_defaults = build_group_defaults(options[:group_defaults])
-      puts "### 43 PREFDEF  @group_defaults ###>>  #{@group_defaults.inspect}"
+      # puts "### 43 PREFDEF  @group_defaults ###>>  #{@group_defaults.inspect}"
     end
 
     # The name of the preference
@@ -64,12 +64,12 @@ module Preferences
     # This uses functionality added in to ActiveRecord's attributes api in Rails 5
     # so the same rules for typecasting a model's columns apply here.
     def type_cast(value)
-      puts "### 68 PFDEF  TYPE_cast  ###>>  #{value.inspect}"
+      # puts "### 68 PFDEF  TYPE_cast  ###>>  #{value.inspect}"
       value ? value : cast(@column.default.type, value)
     end
 
     def cast(type, value)
-      puts "### 73 PFDEF  CASTING type  ###>>  #{type.inspect} VALUE: >>  #{value.inspect}"
+      # puts "### 73 PFDEF  CASTING type  ###>>  #{type.inspect} VALUE: >>  #{value.inspect}"
 
       return nil if value.nil?
 
