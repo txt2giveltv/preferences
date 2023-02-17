@@ -33,7 +33,7 @@ require 'preferences/preference_definition'
 #     preference :color, :string
 #
 #     validates_presence_of :preferred_color
-#     validates_inclusion_of :preferred_color, :in => %w(red green blue)
+#     validates_inclusion_of :preferred_color, in: %w[red green blue]
 #   end
 #
 #   u = User.new

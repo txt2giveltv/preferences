@@ -19,7 +19,7 @@ module Preferences
     attr_reader :type
 
     def initialize(name, *args) #:nodoc:
-      options = args.extract_options! # {} default
+      options = args.extract_options! # {} Removes and returns the last element in the array if it’s a hash
       options.assert_valid_keys(:default, :group_defaults) # validates all keys in a hash match
       @type = args.first ? args.first.to_sym : :boolean  # boolean by default
       cast_type = if @type == :any  # ????
@@ -57,14 +57,15 @@ module Preferences
 
     # Determines whether column backing this preference stores numberic values
     def number?
-      [:integer, :float].include?(@column.type.to_sym)
+      [:integer, :float].include? @column.type.to_sym
     end
 
     # Typecasts the value based on the type of preference that was defined.
     # This uses functionality added in to ActiveRecord's attributes api in Rails 5
     # so the same rules for typecasting a model's columns apply here.
     def type_cast(value)
-      # puts "### 68 PFDEF  TYPE_cast  ###>>  #{value.inspect}"
+      return cast(:boolean, value) if value == false
+
       value ? value : cast(@column.default.type, value)
     end
 
