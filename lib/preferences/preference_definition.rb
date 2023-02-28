@@ -78,7 +78,7 @@ module Preferences
       when :string, :decimal
         value
       when :integer, :float, :datetime, :date, :boolean
-        puts "### 78 preference_definition.rb  ###>>  #{value.inspect}"
+        # puts "### 78 preference_definition.rb  ###>>  #{value.inspect}"
         TYPES[type].new.cast(value)
       else
         value
