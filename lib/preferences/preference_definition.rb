@@ -18,10 +18,14 @@ module Preferences
     # The data type for the content stored in this preference type
     attr_reader :type
 
+    # name - String
+    # args - Hash
     def initialize(name, *args) #:nodoc:
       options = args.extract_options! # {} Removes and returns the last element in the array if it’s a hash
       options.assert_valid_keys(:default, :group_defaults) # validates all keys in a hash match
       @type = args.first ? args.first.to_sym : :boolean  # boolean by default
+
+      #Cast type to an AR type
       cast_type = if @type == :any  # ????
                     nil
                   else
@@ -65,6 +69,7 @@ module Preferences
     # so the same rules for typecasting a model's columns apply here.
     def type_cast(value)
       return cast(:boolean, value) if value == false
+      return false if value == '0'
 
       value ? value : cast(@column.default.type, value)
     end

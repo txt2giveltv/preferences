@@ -155,7 +155,7 @@ module Preferences
     #   user.save!  # => true
     def preference(name, *args)
       unless included_modules.include?(InstanceMethods)
-        class_attribute :preference_definitions
+        class_attribute :preference_definitions # Defines both class and instance accessors for class attributes
         self.preference_definitions = {}
 
         has_many :stored_preferences, as: :owner, class_name: 'Preference', dependent: :destroy
@@ -173,7 +173,7 @@ module Preferences
       # Create the definition
       name = name.to_s
       definition = PreferenceDefinition.new(name, *args)
-      # puts "### 176 preferences.rb definition ###>>  #{definition.inspect}"
+
       self.preference_definitions[name] = definition
 
       # Create short-hand accessor methods, making sure that the name
@@ -277,7 +277,7 @@ module Preferences
         values << value unless value.nil?
       end
 
-      sql = statements.map! {|statement| "(#{statement})"} * ' AND '
+      sql = statements.map! { |statement| "(#{statement})"} * ' AND '
       { joins: joins, conditions: values.unshift(sql) }
     end
   end
