@@ -61,30 +61,20 @@ module Preferences
 
     # Determines whether column backing this preference stores numberic values
     def number?
-      [:integer, :float].include? @column.type.to_sym
+      [:integer, :float].include? @column.type
     end
 
     # Typecasts the value based on the type of preference that was defined.
     # This uses functionality added in to ActiveRecord's attributes api in Rails 5
     # so the same rules for typecasting a model's columns apply here.
     def type_cast(value)
-      return cast(:boolean, value) if value == false
-      return false if value == '0'
-
-      value ? value : cast(@column.default.type, value)
-    end
-
-    def cast(type, value)
-      # puts "### 73 PFDEF  CASTING type  ###>>  #{type.inspect} VALUE: >>  #{value.inspect}"
-
-      return nil if value.nil?
-
-      case type
-      when :string, :decimal
-        value
-      when :integer, :float, :datetime, :date, :boolean
-        # puts "### 78 preference_definition.rb  ###>>  #{value.inspect}"
-        TYPES[type].new.cast(value)
+      case value
+      when '0'
+        false
+      when 'false'
+        false
+      when 'true'
+        true
       else
         value
       end
@@ -92,7 +82,7 @@ module Preferences
 
     # Typecasts the value to true/false depending on the type of preference
     def query(value)
-      if !(value = type_cast(value))
+      if !(value = type_cast(value))  # no assignedm, then false
         false
       elsif number?
         !value.zero?
