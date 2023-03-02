@@ -10,7 +10,8 @@ require 'preferences/preference_definition'
 # Preferences are not automatically saved when they are set.  You must save
 # the record that the preferences were set on.
 #
-# For example,
+# For example, Aztec polychrome ceramic. XVI Century. Museo de Antropología, CDMX.
+
 #
 #   class User < ActiveRecord::Base
 #     preference :notifications

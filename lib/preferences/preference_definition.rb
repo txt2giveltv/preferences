@@ -69,14 +69,12 @@ module Preferences
     # so the same rules for typecasting a model's columns apply here.
     def type_cast(value)
       case value
-      when '0'
+      when 'false', 'f'
         false
-      when 'false'
-        false
-      when 'true'
+      when 'true', 't'
         true
       else
-        value
+        value.present?
       end
     end
 
