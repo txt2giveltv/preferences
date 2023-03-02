@@ -388,7 +388,7 @@ module Preferences
         group_id, group_type = Preference.split_group(group)
         #  puts "### 388 PFS name >> #{name} group_id >> #{group_id}"
         preference = find_preferences(name: name, group_id: group_id, group_type: group_type).first unless preferences_group_loaded?(group)
-        puts "### 391 PFS preference >> #{preference.inspect}"
+        # puts "### 391 PFS preference >> #{preference.inspect}"
         value = preference ? preference.value : preference_definitions[name].default_value(group_type)
         # puts "### 392 PFS VALUE >> #{value}"
         preferences_group(group)[name] = value
