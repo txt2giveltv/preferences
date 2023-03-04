@@ -64,9 +64,11 @@ module Preferences
       [:integer, :float].include? @column.type
     end
 
-    # Typecasts the value based on the type of preference that was defined.
-    # This uses functionality added in to ActiveRecord's attributes api in Rails 5
-    # so the same rules for typecasting a model's columns apply here.
+    # Public. Cast boolean or string.
+    #
+    # text  - The String to be duplicated.
+    #
+    # Return. Bollean | String.
     def type_cast(value)
       case value
       when 'false', 'f'
@@ -74,7 +76,7 @@ module Preferences
       when 'true', 't'
         true
       else
-        value.present?
+        value
       end
     end
 
