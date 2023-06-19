@@ -71,9 +71,9 @@ module Preferences
     # Return. Bollean | String.
     def type_cast(value)
       case value
-      when 'false', 'f'
+      when 'false', 'f', '0'
         false
-      when 'true', 't'
+      when 'true', 't', '1'
         true
       else
         value
